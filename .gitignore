@@ -1,8 +1,10 @@
 *.gem
 *.rbc
+.*.swp
 .bundle
 .config
 config.yaml
+seen.yaml
 coverage
 InstalledFiles
 lib/bundler/man
