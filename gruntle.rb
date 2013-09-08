@@ -37,10 +37,6 @@ def handle_dm ( dm )
         if @config['validusers'].include? dm.sender.screen_name
             puts "New DM from #{dm.sender.screen_name}, ID #{dm.id}"
             Twitter.update(dm.text)
-            @readtweets << dm.id
-
-            # yup, write it out every time.  Whatever, it's low volume
-            File.open(Dir.pwd + '/seen.yaml', 'w+') {|f| f.write(@readtweets.to_yaml) }
         else
             puts "#{dm.sender.screen_name} sent a DM, won't rebroadcast"
         end
@@ -57,9 +53,9 @@ Twitter.direct_messages.each do |dm|
 end
 
 @client = TweetStream::Client.new
+
 @client.on_direct_message do |dm|
     handle_dm dm
 end
-@client.on_error do |message|
-    puts "Error!  #{message}"
-end
+
+@client.userstream
