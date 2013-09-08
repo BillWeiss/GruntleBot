@@ -27,7 +27,7 @@ rescue Errno::ENOENT
     @readtweets = []
 end
 
-followers = Twitter.followers
+followers = Twitter.followers({:skip_status => true})
 friends = Twitter.friends
 
 @validusers = []
@@ -44,7 +44,7 @@ def handle_dm ( dm )
     if @readtweets.include? dm.id
         puts "Duplicate DM from #{dm.sender.screen_name}, ID #{dm.id}"
     else
-        if @validusers.include? dm.sender.screen_name
+        if @validusers.include? dm.sender
             puts "New DM from #{dm.sender.screen_name}, ID #{dm.id}"
 
             if dm.text.include? '@'
