@@ -29,17 +29,22 @@ end
 
 followers = Twitter.followers
 friends = Twitter.friends
-@config['validusers'].each do |user| 
-    twuser = Twitter.user(user)
-    puts "#{user} doesn't follow me!" unless followers.include? twuser
-    puts "I need to follow #{user}!" unless friends.include? twuser
+
+@validusers = []
+
+friends.each do |user|
+    if followers.include? user
+        @validusers << user
+    else
+        puts "#{user.screen_name} doesn't mutually follow, ignoring"
+    end
 end
 
 def handle_dm ( dm )
     if @readtweets.include? dm.id
-        # we've already seen this one, don't do anything with it
+        puts "Duplicate DM from #{dm.sender.screen_name}, ID #{dm.id}"
     else
-        if @config['validusers'].include? dm.sender.screen_name
+        if @validusers.include? dm.sender.screen_name
             puts "New DM from #{dm.sender.screen_name}, ID #{dm.id}"
 
             if dm.text.include? '@'
@@ -58,7 +63,11 @@ def handle_dm ( dm )
     end
 end
 
-Twitter.direct_messages.each do |dm|
+## We can ask Twitter for only DMs after a certain DM.  This will save a
+## little thinking about old DMs.
+mostRecentDM = @readtweets[-1]
+
+Twitter.direct_messages({:since_id => mostRecentDM}).each do |dm|
     handle_dm (dm)
 end
 
