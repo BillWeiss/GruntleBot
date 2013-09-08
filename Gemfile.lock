@@ -22,6 +22,7 @@ GEM
     http_parser.rb (0.5.3)
     multi_json (1.7.9)
     multipart-post (1.2.0)
+    oj (2.1.4)
     simple_oauth (0.2.0)
     tweetstream (2.5.0)
       daemons (~> 1.1)
@@ -39,5 +40,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  oj
   tweetstream
   twitter
