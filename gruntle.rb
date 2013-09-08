@@ -1,5 +1,5 @@
-require 'YAML'
-require 'Twitter'
+require 'yaml'
+require 'twitter'
 require 'tweetstream'
 
 NO_AT_MESSAGE = "Sorry, I won't broadcast anything with an @ in it as a spam safeguard"
@@ -27,10 +27,13 @@ rescue Errno::ENOENT
     @readtweets = []
 end
 
-#config['validusers'].each do |user| 
-#    puts "#{user} doesn't follow me!" unless Twitter.followers.include? Twitter.user(user)
-#    puts "I need to follow #{user}!" unless Twitter.friends.include? Twitter.user(user)
-#end
+followers = Twitter.followers
+friends = Twitter.friends
+@config['validusers'].each do |user| 
+    twuser = Twitter.user(user)
+    puts "#{user} doesn't follow me!" unless followers.include? twuser
+    puts "I need to follow #{user}!" unless friends.include? twuser
+end
 
 def handle_dm ( dm )
     if @readtweets.include? dm.id
