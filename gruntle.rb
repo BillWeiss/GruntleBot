@@ -27,8 +27,8 @@ end
 
 followers = Twitter.followers
 friends = Twitter.friends
-twuser = Twitter.user(user)
 @config['validusers'].each do |user| 
+    twuser = Twitter.user(user)
     puts "#{user} doesn't follow me!" unless followers.include? twuser
     puts "I need to follow #{user}!" unless friends.include? twuser
 end
