@@ -11,4 +11,18 @@ client = Twitter.configure do |twconfig|
     twconfig.oauth_token_secret = config['access_token_secret']
 end
 
-Twitter.update("Working on the bot code.  It's a good start!")
+begin
+    readtweets = YAML.load(File.open('seen.yaml'))
+rescue Errno::ENOENT
+    readtweets = []
+end
+
+config['validusers'].each do |user| 
+    puts "#{user} doesn't follow me!" unless Twitter.followers.include? Twitter.user(user)
+    puts "I need to follow #{user}!" unless Twitter.friends.include? Twitter.user(user)
+end
+
+
+
+
+File.open(Dir.pwd + 'seen.yaml', 'w+') {|f| f.write(readtweets.to_yaml) }
