@@ -4,6 +4,7 @@ require 'twitter'
 require 'tweetstream'
 
 $NO_AT_MESSAGE = "Sorry, I won't broadcast anything with an @ in it as a spam safeguard"
+$NO_LINK_MESSAGE = "There's no way this thing can safely send links.  Sorry"
 
 @config = YAML.load(File.open('config.yaml'))
 
@@ -50,6 +51,8 @@ def handle_dm ( dm )
 
             if dm.text.include? '@'
                 Twitter.direct_message_create(dm.sender, $NO_AT_MESSAGE)
+            elsif dm.text.include? 'http'
+                Twitter.direct_message_create(dm.sender, $NO_LINK_MESSAGE)
             else
                 Twitter.update(dm.text)
             end
