@@ -2,7 +2,7 @@ require 'yaml'
 require 'twitter'
 require 'tweetstream'
 
-NO_AT_MESSAGE = "Sorry, I won't broadcast anything with an @ in it as a spam safeguard"
+$NO_AT_MESSAGE = "Sorry, I won't broadcast anything with an @ in it as a spam safeguard"
 
 @config = YAML.load(File.open('config.yaml'))
 
@@ -42,10 +42,11 @@ def handle_dm ( dm )
         if @config['validusers'].include? dm.sender.screen_name
             puts "New DM from #{dm.sender.screen_name}, ID #{dm.id}"
 
-            if dm.text.includes? '@'
-                Twitter.direct_message_create(dm.sender, NO_AT_MESSAGE)
+            if dm.text.include? '@'
+                Twitter.direct_message_create(dm.sender, $NO_AT_MESSAGE)
+            else
+                Twitter.update(dm.text)
             end
-            Twitter.update(dm.text)
         else
             puts "#{dm.sender.screen_name} sent a DM, won't rebroadcast"
         end
