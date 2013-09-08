@@ -4,7 +4,7 @@ require 'tweetstream'
 
 config = YAML.load(File.open('config.yaml'))
 
-client = Twitter.configure do |twconfig|
+Twitter.configure do |twconfig|
     twconfig.consumer_key = config['consumer_key']
     twconfig.consumer_secret = config['consumer_secret']
     twconfig.oauth_token = config['access_token']
@@ -12,17 +12,29 @@ client = Twitter.configure do |twconfig|
 end
 
 begin
-    readtweets = YAML.load(File.open('seen.yaml'))
+    @readtweets = YAML.load(File.open('seen.yaml'))
 rescue Errno::ENOENT
-    readtweets = []
+    @readtweets = []
 end
 
-config['validusers'].each do |user| 
-    puts "#{user} doesn't follow me!" unless Twitter.followers.include? Twitter.user(user)
-    puts "I need to follow #{user}!" unless Twitter.friends.include? Twitter.user(user)
+#config['validusers'].each do |user| 
+#    puts "#{user} doesn't follow me!" unless Twitter.followers.include? Twitter.user(user)
+#    puts "I need to follow #{user}!" unless Twitter.friends.include? Twitter.user(user)
+#end
+
+def handle_dm ( dm )
+    if @readtweets.include? dm.id
+        # nothing, it's cool
+    else
+        Twitter.update(dm.text)
+        @readtweets << dm.id
+
+        # yup, write it out every time.  Whatever, it's low volume
+        File.open(Dir.pwd + '/seen.yaml', 'w+') {|f| f.write(@readtweets.to_yaml) }
+    end
 end
 
+Twitter.direct_messages.each do |dm|
+    handle_dm (dm)
+end
 
-
-
-File.open(Dir.pwd + 'seen.yaml', 'w+') {|f| f.write(readtweets.to_yaml) }
