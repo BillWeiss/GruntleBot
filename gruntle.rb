@@ -25,10 +25,10 @@ rescue Errno::ENOENT
     @readtweets = []
 end
 
-#config['validusers'].each do |user| 
-#    puts "#{user} doesn't follow me!" unless Twitter.followers.include? Twitter.user(user)
-#    puts "I need to follow #{user}!" unless Twitter.friends.include? Twitter.user(user)
-#end
+config['validusers'].each do |user| 
+    puts "#{user} doesn't follow me!" unless Twitter.followers.include? Twitter.user(user)
+    puts "I need to follow #{user}!" unless Twitter.friends.include? Twitter.user(user)
+end
 
 def handle_dm ( dm )
     if @readtweets.include? dm.id
