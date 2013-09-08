@@ -1,5 +1,5 @@
-require 'YAML'
-require 'Twitter'
+require 'yaml'
+require 'twitter'
 require 'tweetstream'
 
 @config = YAML.load(File.open('config.yaml'))
@@ -25,9 +25,12 @@ rescue Errno::ENOENT
     @readtweets = []
 end
 
-config['validusers'].each do |user| 
-    puts "#{user} doesn't follow me!" unless Twitter.followers.include? Twitter.user(user)
-    puts "I need to follow #{user}!" unless Twitter.friends.include? Twitter.user(user)
+followers = Twitter.followers
+friends = Twitter.friends
+twuser = Twitter.user(user)
+@config['validusers'].each do |user| 
+    puts "#{user} doesn't follow me!" unless followers.include? twuser
+    puts "I need to follow #{user}!" unless friends.include? twuser
 end
 
 def handle_dm ( dm )
