@@ -28,13 +28,13 @@ rescue Errno::ENOENT
     @readtweets = []
 end
 
-@followers = Twitter.followers({:skip_status => true}).all
-@friends = Twitter.friends.all
+followers = Twitter.followers({:skip_status => true}).all
+friends = Twitter.friends.all
 
 @validUsers = []
 
-@friends.each do |user|
-    if @followers.include? user
+friends.each do |user|
+    if followers.include? user
         @validUsers << user
     else
         puts "#{user.screen_name} doesn't mutually follow, ignoring"
@@ -65,11 +65,30 @@ def handle_dm ( dm )
 end
 
 def handle_follow ( event )
-    newFollower = Twitter.user(event[:source][:id])
+    if event[:source][:id] == Twitter.user.id
+        # this is the bot following someone
+        newFriend = Twitter.user(event[:source][:id])
 
-    if @friends.include? newFollower
-        puts "#{newFollower.screen_name} is now a mutual follower!"
-        @validUsers << newFollower
+        if Twitter.followers({:skip_status => true}).include? newFriend
+            puts "#{newFollower.screen_name} is now a mutual follower!"
+            @validUsers << newFollower
+        else
+            puts "We now follow #{newFollower.screen_name}, but it's not mutual"
+        end
+
+    elsif event[:target][:id] == Twitter.user.id
+        # new follower!
+        newFollower = Twitter.user(event[:source][:id])
+
+        # this hits the API to ask if we're following them
+        if newFollower.following?
+            # if we mutually follow, allow them to use the bot
+            puts "#{newFollower.screen_name} is now a mutual follower!"
+            @validUsers << newFollower
+        else
+            # maybe we'll follow them later
+            puts "New follower: #{newFollower.screen_name}"
+        end
     end
 end
 
