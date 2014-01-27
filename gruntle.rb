@@ -42,6 +42,24 @@ friends.each do |user|
     end
 end
 
+def handle_command ( dm )
+    foo = dm.text.split
+    admin_user = dm.sender.screen_name
+    command = foo[1]
+    params = foo[2..-1]
+
+    case command
+    when "Follow", "follow"
+        Twitter.follow(params[0])
+        Twitter.direct_message_create(dm.sender, 
+            "Just followed #{params[0]} on your command in ID #{dm.id}")
+        puts "Command '#{command}' from #{admin_user} in ID #{dm.id}"
+    else
+        puts "Command from #{admin_user} doesn't make sense, ID #{dm.id}"
+        puts "Command was '#{dm.text}'"
+    end
+end
+
 def handle_dm ( dm )
     if @readtweets.include? dm.id
         puts "Duplicate DM from #{dm.sender.screen_name}, ID #{dm.id}"
@@ -49,7 +67,10 @@ def handle_dm ( dm )
         if @validUsers.include? dm.sender
             puts "New DM from #{dm.sender.screen_name}, ID #{dm.id}"
 
-            if dm.text.include? '@'
+            if ( dm.text.start_with?(@config['command_prefix']) and
+                @config['admins'].include?(dm.sender.screen_name) )
+                handle_command dm
+            elsif dm.text.include? '@'
                 Twitter.direct_message_create(dm.sender, $NO_AT_MESSAGE)
             elsif dm.text.include? 'http'
                 Twitter.direct_message_create(dm.sender, $NO_LINK_MESSAGE)
